@@ -1,0 +1,22 @@
+FROM alpine as downloader
+RUN apk add curl 
+ARG BEAT
+ARG VERSION
+RUN curl -o ${BEAT}.yml -sfSL https://raw.githubusercontent.com/elastic/beats/${VERSION}/${BEAT}/${BEAT}.docker.yml
+
+## 
+FROM gcr.io/distroless/static
+
+ARG BEAT
+ARG VERSION
+ARG TARGETOS
+ARG TARGETARCH 
+
+COPY out/${BEAT}-${VERSION}-${TARGETOS}-${TARGETARCH} /${BEAT}/{BEAT}
+COPY --from=downloader /${BEAT}.yml /${BEAT}/${BEAT}.yml
+
+WORKDIR /${BEAT}
+#ENTRYPOINT [ $BEAT, "-c", ${BEAT}.yml ]
+ENTRYPOINT [ $BEAT, "-c", ${BEAT}.yml ]
+
+

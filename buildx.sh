@@ -8,7 +8,7 @@ cd $(dirname $0)
 
 ROOTDIR=$(pwd)
 
-version=$(cat .version) || exit 1
+version=v$(cat .version) || exit 1
 
 git submodule update --init --recursive
 
