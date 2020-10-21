@@ -1,5 +1,5 @@
 
-ARG base
+ARG DISTROLESS
 
 FROM alpine as downloader
 RUN apk add curl 
@@ -10,7 +10,7 @@ RUN set -xeu ; curl -o filebeat.tar.gz -sfSL https://artifacts.elastic.co/downlo
     && tar xf filebeat.tar.gz && rm -f filebeat-${VERSION}-linux-x86_64/filebeat
 
 
-FROM ${base}
+FROM ${DISTROLESS}
 
 ARG BEAT
 ARG VERSION
