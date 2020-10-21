@@ -2,7 +2,9 @@ FROM alpine as downloader
 RUN apk add curl 
 ARG BEAT
 ARG VERSION
-RUN curl -o ${BEAT}.yml -sfSL https://raw.githubusercontent.com/elastic/beats/${VERSION}/${BEAT}/${BEAT}.docker.yml
+# RUN curl -o ${BEAT}.yml -sfSL https://raw.githubusercontent.com/elastic/beats/${VERSION}/${BEAT}/${BEAT}.docker.yml
+RUN set -xeu ; curl -o ${BEAT}.tar.gz -sfSL https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${VERSION}-linux-x86_64.tar.gz \
+    && tar xf filebeat.tar.gz && rm -f filebeat-${VERSION}-linux-x86_64/filebeat
 
 ## 
 FROM gcr.io/distroless/static
@@ -12,11 +14,14 @@ ARG VERSION
 ARG TARGETOS
 ARG TARGETARCH 
 
-COPY out/${BEAT}-${VERSION}-${TARGETOS}-${TARGETARCH} /${BEAT}/{BEAT}
-COPY --from=downloader /${BEAT}.yml /${BEAT}/${BEAT}.yml
+COPY out/${BEAT}-v${VERSION}-${TARGETOS}-${TARGETARCH} /${BEAT}/${BEAT}
+# COPY --from=downloader /${BEAT}.yml /${BEAT}/${BEAT}.yml
+COPY --from=downloader /filebeat-${VERSION}-linux-x86_64 /${BEAT}/
+
+ENV PATH /filebeat:$PATH
 
 WORKDIR /${BEAT}
-#ENTRYPOINT [ $BEAT, "-c", ${BEAT}.yml ]
-ENTRYPOINT [ $BEAT, "-c", ${BEAT}.yml ]
+ENTRYPOINT [ "filebeat", "-c", "filebeat.yml" ]
+CMD ["--environment", "container"]
 
 
