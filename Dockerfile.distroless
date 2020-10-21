@@ -1,27 +1,32 @@
+
+ARG base
+
 FROM alpine as downloader
 RUN apk add curl 
 ARG BEAT
 ARG VERSION
-# RUN curl -o ${BEAT}.yml -sfSL https://raw.githubusercontent.com/elastic/beats/${VERSION}/${BEAT}/${BEAT}.docker.yml
-RUN set -xeu ; curl -o ${BEAT}.tar.gz -sfSL https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${VERSION}-linux-x86_64.tar.gz \
+
+RUN set -xeu ; curl -o filebeat.tar.gz -sfSL https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${VERSION}-linux-x86_64.tar.gz \
     && tar xf filebeat.tar.gz && rm -f filebeat-${VERSION}-linux-x86_64/filebeat
 
-## 
-FROM gcr.io/distroless/static
+
+FROM ${base}
 
 ARG BEAT
 ARG VERSION
 ARG TARGETOS
 ARG TARGETARCH 
 
-COPY out/${BEAT}-v${VERSION}-${TARGETOS}-${TARGETARCH} /${BEAT}/${BEAT}
-# COPY --from=downloader /${BEAT}.yml /${BEAT}/${BEAT}.yml
-COPY --from=downloader /filebeat-${VERSION}-linux-x86_64 /${BEAT}/
+COPY --from=downloader /filebeat-${VERSION}-linux-x86_64 /usr/share/filebeat/
+COPY out/filebeat-v${VERSION}-${TARGETOS}-${TARGETARCH} /usr/share/filebeat/filebeat
+# RUN mkdir -p /usr/share/filebeat/data /usr/share/filebeat/logs
 
-ENV PATH /filebeat:$PATH
+ENV PATH /usr/share/filebeat:$PATH
+ENV ENV ELASTIC_CONTAINER=true
 
-WORKDIR /${BEAT}
-ENTRYPOINT [ "filebeat", "-c", "filebeat.yml" ]
+WORKDIR /usr/share/filebeat
+
+ENTRYPOINT [ "filebeat" ]
 CMD ["--environment", "container"]
 
 
