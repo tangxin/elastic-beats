@@ -10,15 +10,14 @@ ROOTDIR=$(pwd)
 
 version=v$(cat .version) || exit 1
 
-git submodule update --init --recursive
-cd ${ROOTDIR}/beats/ && git checkout ${version}
+# git submodule update --init --recursive
+# cd ${ROOTDIR}/beats/ && git checkout ${version}
 
 function gobuild(){
 	CGO_ENABLED=0 go build -o ${ROOTDIR}/out/${beat}-${version}-${GOOS}-${GOARCH} .
 }
 
-#for beat in $(ls |grep beat)
-for beat in filebeat
+for beat in $(ls ${ROOTDIR}/beats |grep beat)
 do
 {
 	echo $beat
