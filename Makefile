@@ -33,7 +33,8 @@ docker.all: build
 	#  make 后面的分号 很重要， 没有则不会判定为可执行语句
 	$(foreach beat,	\
 		$(BEATs),	\
-		make docker.static -B BEAT=$(beat) ;	\
+		make docker.static -B BEAT=$(beat) ; \
+		make docker.cc-debug -B BEAT=$(beat) ;  \
 	)
 
 clean: checkout.reset
