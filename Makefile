@@ -13,7 +13,7 @@ docker.prepare:
 
 docker.distroless: docker.prepare
 	docker buildx build --push --platform=linux/amd64,linux/arm64 --progress plain \
-		--tag tangx/$(BEAT):$(VERSION)-$(subst :,-,$(DISTROLESS)) \
+		--tag kubeimages/$(BEAT):$(VERSION)-$(subst :,-,$(DISTROLESS)) \
 		--file $(BEAT).Dockerfile.distroless \
 		--build-arg BEAT=$(BEAT) \
 		--build-arg VERSION=$(VERSION) \
@@ -28,8 +28,9 @@ docker.cc-debug:
 
 docker.echo:
 	echo docker buildx $(BEAT)
-docker.all:
-	# $(foreach beat,$(BEATs),make docker.static -B BEAT=$(beat))
+
+docker.all: build
+	#  make 后面的分号 很重要， 没有则不会判定为可执行语句
 	$(foreach beat,	\
 		$(BEATs),	\
 		make docker.static -B BEAT=$(beat) ;	\
@@ -39,8 +40,10 @@ clean: checkout.reset
 	rm -rf out
 
 checkout.reset:
-	cd beats && git checkout . && git checkout master
+	cd beats && git checkout . && git checkout master && cd -
 
-checkout.version:
-	git submodule update --init --recursive && \
-		cd beats && git checkout v$(VERSION) 
+# .PHONY: checkout.version
+checkout.version: checkout.reset
+	git submodule update --init --recursive &&  \
+	cd beats && git pull && git checkout v$(VERSION) && cd -
+	
