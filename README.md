@@ -4,14 +4,15 @@ this repo is for building elastic stack beats images with multiple cpu architect
 
 # images
 
-all images are use [google distroless image](https://github.com/GoogleContainerTools/distroless) as basic.
+1. common image `${image}:${version}` are using [debian:buster-slim](https://hub.docker.com/_/debian?tab=tags&page=1&name=buster-slim) as basic image.
+2. runtime images `${image}:${version}-static` are using [google distroless image](https://github.com/GoogleContainerTools/distroless) as basic image. suggest to use it in product
 
-+ `${image}:${version}-static` is use for product enviroments.
-+ `${image}:${version}-cc-debug` is use for dev enviroments or debug purpose.
 
 ## hub.docker Organizations
 
 kubeimages:  https://hub.docker.com/orgs/kubeimages/repositories
+
++ `kubeimages/filebeat:7.9.3`, `kubeimages/filebeat:7.9.3-static`
 
 
 # notice
