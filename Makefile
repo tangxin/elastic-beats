@@ -11,6 +11,14 @@ docker.prepare:
 	cp -a Dockerfile.distroless.tpl $(BEAT).Dockerfile.distroless && \
 	sed -i "s/{{ BEAT_BIN }}/$(BEAT)/g" $(BEAT).Dockerfile.distroless
 
+docker.debian:
+	docker buildx build --push --platform=linux/amd64,linux/arm64 --progress plain \
+		--tag kubeimages/$(BEAT):$(VERSION) \
+		--file Dockerfile \
+		--build-arg BEAT=$(BEAT) \
+		--build-arg VERSION=$(VERSION) \
+		.
+
 docker.distroless: docker.prepare
 	docker buildx build --push --platform=linux/amd64,linux/arm64 --progress plain \
 		--tag kubeimages/$(BEAT):$(VERSION)-$(subst :,-,$(DISTROLESS)) \
@@ -34,7 +42,7 @@ docker.all: build
 	$(foreach beat,	\
 		$(BEATs),	\
 		make docker.static -B BEAT=$(beat) ; \
-		make docker.cc-debug -B BEAT=$(beat) ;  \
+		make docker.debian ; \
 	)
 
 clean: checkout.reset
