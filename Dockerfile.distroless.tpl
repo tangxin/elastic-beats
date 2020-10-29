@@ -2,24 +2,26 @@ ARG DISTROLESS
 
 ##
 FROM alpine:3.12 as downloader
-ARG VERSION
 RUN apk add --no-cache curl ca-certificates
 WORKDIR /root/
-RUN set -ex; curl -o {{ BEAT_BIN }}.yml -sfSL https://raw.githubusercontent.com/elastic/beats/v${VERSION}/{{ BEAT_BIN }}/{{ BEAT_BIN }}.reference.yml
+ARG VERSION
+ARG BEAT
+RUN set -ex; curl -o ${BEAT}.yml -sfSL https://raw.githubusercontent.com/elastic/beats/v${VERSION}/${BEAT}/${BEAT}.reference.yml
 
 ## 
 FROM ${DISTROLESS}
-ARG VERSION
 ARG TARGETOS
 ARG TARGETARCH 
+ARG VERSION
+ARG BEAT
 
-WORKDIR /usr/share/{{ BEAT_BIN }}
+WORKDIR /usr/share/${BEAT}
 
-ENV PATH /usr/share/{{ BEAT_BIN }}:$PATH
+ENV PATH /usr/share/${BEAT}:$PATH
 ENV ENV ELASTIC_CONTAINER=true
 
-COPY out/{{ BEAT_BIN }}-v${VERSION}-${TARGETOS}-${TARGETARCH} /usr/share/{{ BEAT_BIN }}/{{ BEAT_BIN }}
-COPY --from=downloader /root/{{ BEAT_BIN }}.yml {{ BEAT_BIN }}.yml
+COPY out/${BEAT}-v${VERSION}-${TARGETOS}-${TARGETARCH} /usr/share/${BEAT}/${BEAT}
+COPY --from=downloader /root/${BEAT}.yml ${BEAT}.yml
 
-ENTRYPOINT [ "{{ BEAT_BIN }}" ]
+ENTRYPOINT [ "{{ BEAT }}" ]
 CMD ["--environment", "container"]

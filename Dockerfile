@@ -18,7 +18,7 @@ ENV PATH /usr/share/${BEAT}:$PATH
 ENV ENV ELASTIC_CONTAINER=true
 WORKDIR /usr/share/${BEAT}
 
-RUN groupadd --gid 1000 \
+RUN groupadd --gid 1000 ${BEAT} \
     && useradd -M --uid 1000 --gid 1000 --groups 0 --home /usr/share/${BEAT} ${BEAT}
 USER ${BEAT}
 

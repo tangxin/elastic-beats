@@ -9,7 +9,7 @@ build: checkout.version
 docker.prepare:
 	rm -f $(BEAT).Dockerfile.distroless && \
 	cp -a Dockerfile.distroless.tpl $(BEAT).Dockerfile.distroless && \
-	sed -i "s/{{ BEAT_BIN }}/$(BEAT)/g" $(BEAT).Dockerfile.distroless
+	sed -i 's/{{ BEAT }}/$(BEAT)/g' $(BEAT).Dockerfile.distroless
 
 docker.debian:
 	docker buildx build --push --platform=linux/amd64,linux/arm64 --progress plain \
@@ -41,8 +41,8 @@ docker.all: build
 	#  make 后面的分号 很重要， 没有则不会判定为可执行语句
 	$(foreach beat,	\
 		$(BEATs),	\
+		make docker.debian -B BEAT=$(beat); \
 		make docker.static -B BEAT=$(beat) ; \
-		make docker.debian ; \
 	)
 
 clean: checkout.reset
