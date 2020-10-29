@@ -47,6 +47,7 @@ docker.all: build
 
 clean: checkout.reset
 	rm -rf out
+	rm -f *.Dockerfile.distroless
 
 checkout.reset:
 	cd beats && git checkout . && git checkout master && cd -
