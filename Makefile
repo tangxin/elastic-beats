@@ -55,5 +55,5 @@ checkout.reset:
 # .PHONY: checkout.version
 checkout.version: checkout.reset
 	git submodule update --init --recursive &&  \
-	cd beats && git pull && git checkout v$(VERSION) && cd -
+	cd beats && git checkout master && git pull && git checkout v$(VERSION) && cd -
 	
